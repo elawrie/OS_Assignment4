@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include "buffer.h"
+#include "Checksum.c"
 
 
 //DONT FORGET TO CALCULATE CHECKSUM
@@ -16,10 +17,10 @@ void *producer(void *param){
         sleep(sleep_time);
         /* generate a random number */
         for(int i = 0; i < 30; i++) {
-            item.data[i] = rand() % 256; // Assign random values to data
+            item.data[i] = (uint8_t) rand() % 256; // Assign random values to data
         }
-        item.cksum = 0; // Initialize checksum
-        if(insert_item(item)){
+        item.cksum = checksum((char*)item.data, 16); 
+        if(insert_item(item) == -1){
             fprintf(stderr, "report error condition");
         }
         else{
@@ -36,11 +37,17 @@ void *consumer(void *param){
         /* sleep for a random period of time */
         int sleep_time = rand() % 5 + 1; 
         sleep(sleep_time);
-        if(remove_item(&item)){
+        if(remove_item(&item) == -1){
             fprintf(stderr, "report error condition");
         }
         else{
-            printf("consumer consumed %d\n", item);
+            uint16_t check = checksum((char*)item.data, 16);
+            if(check == item.cksum){
+                printf("Consumed successfully\n");
+            }
+            else{
+                printf("checksum FLOPPED!\n");
+            }
         }
     }
 }
@@ -75,19 +82,21 @@ int main(int argc, char *argv[]){
     buffer_init();
 
     // Create producer threads
-    for(int i = 0; i < num_producers; i++){
-        pthread_t tid;
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_create(&tid, &attr, producer, NULL);
+    pthread_t prod_threads[num_producers];
+    for (int i = 0; i < num_producers; i++) {
+        pthread_create(&prod_threads[i], NULL, producer, NULL);
+    }
+    pthread_t con_threads[num_consumers];
+    for (int i = 0; i < num_consumers; i++) {
+        pthread_create(&con_threads[i], NULL, consumer, NULL);
     }
 
-    // Create consumer threads
-    for(int i = 0; i < num_consumers; i++){
-        pthread_t tid;
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_create(&tid, &attr, consumer, NULL);
+    // join threads
+    for (int i = 0; i < num_producers; i++) {
+        pthread_join(prod_threads[i], NULL);
+    }
+    for (int i = 0; i < num_consumers; i++) {
+        pthread_join(con_threads[i], NULL);
     }
 
     // Sleep
