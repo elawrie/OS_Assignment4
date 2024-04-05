@@ -11,7 +11,8 @@ void *producer(void *param){
 
     while(true){
         /* sleep for a random period of time */
-        sleep(1); // Sleep for 1 second
+        int sleep_time = rand() % 5 + 1; 
+        sleep(sleep_time);
         /* generate a random number */
         for(int i = 0; i < 30; i++) {
             item.data[i] = rand() % 256; // Assign random values to data
@@ -32,7 +33,8 @@ void *consumer(void *param){
 
     while(true){
         /* sleep for a random period of time */
-        sleep(2); // Sleep for 2 seconds
+        int sleep_time = rand() % 5 + 1; 
+        sleep(sleep_time);
         if(remove_item(&item)){
             fprintf(stderr, "report error condition");
         }
