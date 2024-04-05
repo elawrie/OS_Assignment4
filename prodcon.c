@@ -20,10 +20,7 @@ void *producer(void *param){
             item.data[i] = (uint8_t) rand() % 256; // Assign random values to data
         }
         item.cksum = checksum((char*)item.data, 16); 
-        if(insert_item(item) == -1){
-            fprintf(stderr, "Error: Unable to insert item into buffer\n");
-        }
-        else{
+        if(insert_item(item) == 0){
             // printf("producer produced %p\n", item);
             printf("producer produced {data: ");
             for (int i = 0; i < 30; ++i) {
@@ -31,10 +28,13 @@ void *producer(void *param){
             }
             printf(", cksum: %d}\n", item.cksum);
         }
+        else{
+            fprintf(stderr, "Error: Unable to insert item into buffer\n");    
+        }
     }
 }
 
-//DONT FORGET TO CALCULATE CHECKSUM
+// consumer function 
 void *consumer(void *param){
     BUFFER_ITEM item;
 
@@ -42,10 +42,7 @@ void *consumer(void *param){
         /* sleep for a random period of time */
         int sleep_time = rand() % 5 + 1; 
         sleep(sleep_time);
-        if(remove_item(&item) == -1){
-            fprintf(stderr, "Error: Unable to remove item from buffer\n");
-        }
-        else{
+        if(remove_item(&item) == 0){
             uint16_t check = checksum((char*)item.data, 16);
             if(check == item.cksum){
                 printf("Consumed successfully\n");
@@ -54,9 +51,11 @@ void *consumer(void *param){
                 printf("checksum FLOPPED!\n");
             }
         }
+        else{
+            fprintf(stderr, "Error: Unable to remove item from buffer\n");
+        }
     }
 }
-
 
 /* 1. get command line arguments argv[1] argv[2] and argv[3]*/
 /* 2. initialize buffer */
@@ -82,6 +81,8 @@ int main(int argc, char *argv[]){
         fprintf(stderr, "Invalid arguments\n");
         return -1;
     }
+
+    buffer_cleanup();
 
     // Initialize buffer
     buffer_init();

@@ -1,3 +1,6 @@
+#ifndef BUFFER_H
+#define BUFFER_H
+
 #include <stdint.h>
 
 /* buffer.h */
@@ -12,3 +15,6 @@ typedef struct buffer_item {
 int buffer_init();
 int insert_item(struct buffer_item item);
 int remove_item(struct buffer_item *item);
+int buffer_cleanup();
+
+#endif
