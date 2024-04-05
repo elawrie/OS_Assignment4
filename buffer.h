@@ -7,3 +7,8 @@ typedef struct buffer_item {
 } BUFFER_ITEM;
 
 #define BUFFER_SIZE 10
+
+// function definitions
+int buffer_init();
+int insert_item(buffer_item item);
+int remove_item(buffer_item *item);
