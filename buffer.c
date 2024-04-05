@@ -25,20 +25,22 @@ int buffer_init() {
 int insert_item(BUFFER_ITEM item) {
     // acquire the semaphore
     sem_wait(empty);
+    sem_wait(mutex);
 
-    if (sem_trywait(empty) != 0) {
-        sem_post(mutex);
-        return -1;
-    }
+    // if (sem_trywait(empty) != 0) {
+    //     sem_post(mutex);
+    //     return -1;
+    // }
 
     // produce an item 
     buffer[index_buffer] = item; 
-    // make the array a circular queue
-    index_buffer = (index_buffer + 1) % BUFFER_SIZE; 
 
     // release the semaphores
     sem_post(full);
     sem_post(mutex);
+
+    // make the array a circular queue
+    index_buffer = (index_buffer + 1) % BUFFER_SIZE; 
 
     // return 0 if insertion successful 
     return 0;
@@ -57,12 +59,13 @@ int remove_item(BUFFER_ITEM *item) {
     // consume an item
     // get item from the buffer 
     *item = buffer[index_buffer];
-    // make the array a circular queue
-    index_buffer = (index_buffer + 1) % BUFFER_SIZE;
 
     // release the semaphores
     sem_post(empty);
     sem_post(mutex);
+
+    // update the buffer index
+    index_buffer = (index_buffer + 1) % BUFFER_SIZE;
 
     // return 0 if removal successful
     return 0;

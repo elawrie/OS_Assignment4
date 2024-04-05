@@ -4,10 +4,10 @@
 #include <unistd.h>
 #include <pthread.h>
 #include "buffer.h"
-#include "Checksum.c"
+#include "checksum.c"
 
 
-//DONT FORGET TO CALCULATE CHECKSUM
+// producer function 
 void *producer(void *param){
     BUFFER_ITEM item;
 
@@ -21,10 +21,15 @@ void *producer(void *param){
         }
         item.cksum = checksum((char*)item.data, 16); 
         if(insert_item(item) == -1){
-            fprintf(stderr, "report error condition");
+            fprintf(stderr, "Error: Unable to insert item into buffer\n");
         }
         else{
-            printf("producer produced %d\n", item);
+            // printf("producer produced %p\n", item);
+            printf("producer produced {data: ");
+            for (int i = 0; i < 30; ++i) {
+                printf("%d ", item.data[i]);
+            }
+            printf(", cksum: %d}\n", item.cksum);
         }
     }
 }
@@ -38,7 +43,7 @@ void *consumer(void *param){
         int sleep_time = rand() % 5 + 1; 
         sleep(sleep_time);
         if(remove_item(&item) == -1){
-            fprintf(stderr, "report error condition");
+            fprintf(stderr, "Error: Unable to remove item from buffer\n");
         }
         else{
             uint16_t check = checksum((char*)item.data, 16);
