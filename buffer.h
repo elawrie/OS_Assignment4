@@ -13,7 +13,7 @@ typedef struct buffer_item {
 
 // function definitions
 int buffer_init();
-int insert_item(struct buffer_item item);
+int insert_item(struct buffer_item *item);
 int remove_item(struct buffer_item *item);
 int buffer_cleanup();
 
