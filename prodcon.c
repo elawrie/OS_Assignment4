@@ -43,17 +43,17 @@ void *consumer (void *param) {
         /* sleep for a random period of time */
         int sleep_time = rand() % 5 + 1; 
         sleep(sleep_time);
-        if (remove_item(&item)) {
-            fprintf(stderr, "Error: Unable to remove item from buffer\n");
-        }
-        else {
+        if (remove_item(&item) == 0) {
             check = checksum((char*)item.data, sizeof(item.data));
-            if (check != item.cksum) {
-                printf("Checksum invalid (did not match)\n");
-            }
-            else {
+            if (check == item.cksum) {
                 printf("consumer consumed cksum: %d \n", item.cksum);
             }
+            else {
+                printf("Checksum invalid (did not match)\n");
+            }
+        }
+        else {
+            fprintf(stderr, "Error: Unable to remove item from buffer\n");
         }
     }
 }
@@ -84,6 +84,7 @@ int main (int argc, char *argv[]) {
     }
 
     // initialize buffer
+    buffer_cleanup();
     buffer_init();
 
     // create producer threads
@@ -105,7 +106,6 @@ int main (int argc, char *argv[]) {
     // }
 
     // cleanup memory allocation 
-    buffer_cleanup();
 
     // sleep
     sleep(sleep_time);
