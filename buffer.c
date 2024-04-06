@@ -42,8 +42,8 @@ int buffer_init() {
 // cleanup function
 int buffer_cleanup() {
     // close semaphores
-    sem_close(empty);
-    sem_close(full);
+    // sem_close(empty);
+    // sem_close(full);
     // sem_close(mutex);
     pthread_mutex_destroy(&mutex);
     // unlink the semaphores

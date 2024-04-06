@@ -8,7 +8,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include "buffer.h"
-#include "checksum.c"
+#include "Checksum.c"
 
 
 // producer function 
@@ -29,11 +29,7 @@ void *producer (void *param) {
         }
         else {
             // printf("producer produced %p\n", item);
-            printf("producer produced {data: ");
-            for (int i = 0; i < 30; ++i) {
-                printf("%d ", item.data[i]);
-            }
-            printf(", cksum: %d}\n", item.cksum);
+            printf("producer produced cksum: %d \n", item.cksum);
         }
     }
 }
@@ -56,7 +52,7 @@ void *consumer (void *param) {
                 printf("Checksum invalid (did not match)\n");
             }
             else {
-                printf("Consumed successfully\n");
+                printf("consumer consumed cksum: %d \n", item.cksum);
             }
         }
     }
