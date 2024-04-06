@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <fcntl.h>
-#include <errno.h>
 #include <stdbool.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -16,20 +14,22 @@ void *producer (void *param) {
     BUFFER_ITEM item;
 
     while (true) {
-        /* sleep for a random period of time */
+        // sleep for a random period of time
         int sleep_time = rand() % 5 + 1; 
-        sleep(sleep_time);
-        /* generate a random number */
+        // generate a random number 
         for (int i = 0; i < 30; i++) {
-            item.data[i] = (uint8_t) rand() % 256; // Assign random values to data
+            item.data[i] = (uint8_t) rand() % 256; // assign random values to data
         }
+
+        // calculate checksum
         item.cksum = checksum((char*)item.data, sizeof(item.data)); 
-        if (insert_item(&item)) {
-            fprintf(stderr, "Error: Unable to insert item into buffer\n"); 
+        sleep(sleep_time); // sleep for a random period of time
+
+        if (insert_item(&item) == 0) {
+            printf("Producer produced with checksum: %d \n", item.cksum);
         }
         else {
-            // printf("producer produced %p\n", item);
-            printf("producer produced cksum: %d \n", item.cksum);
+            fprintf(stderr, "Error: unable to insert into full buffer. Retrying now\n"); 
         }
     }
 }
@@ -40,37 +40,37 @@ void *consumer (void *param) {
     uint16_t check;
 
     while (true) {
-        /* sleep for a random period of time */
+        // sleep for a random period of time 
         int sleep_time = rand() % 5 + 1; 
         sleep(sleep_time);
+
+        // consume the item
         if (remove_item(&item) == 0) {
+            // calculate checksum
             check = checksum((char*)item.data, sizeof(item.data));
             if (check == item.cksum) {
-                printf("consumer consumed cksum: %d \n", item.cksum);
+                printf("Consumer consumed data with checksum: %d \n", item.cksum);
             }
             else {
-                printf("Checksum invalid (did not match)\n");
+                printf("Error: there is a checksum mismatch. Received checksum: %d and expected checksum: %d\n", check, item.cksum);
+                exit(0);
             }
         }
         else {
-            fprintf(stderr, "Error: Unable to remove item from buffer\n");
+            fprintf(stderr, "Error: unable to remove from empty buffer. Retrying now\n");
         }
     }
 }
 
-/* 1. get command line arguments argv[1] argv[2] and argv[3]*/
-/* 2. initialize buffer */
-/* 3. create producer thread(s) */
-/* 4. create consumer thread(s) */
-/* 5. sleep */
-/* 6. exit */
+
 int main (int argc, char *argv[]) {
     int sleep_time;
     int num_producers;
     int num_consumers;
 
+    // error handling for incorrect number of arguments
     if (argc != 4) {
-        fprintf(stderr, "Usage: %s <sleep time> <num producers> <num consumers>\n", argv[0]);
+        fprintf(stderr, "Proper format: %s sleep_time num_producers num_consumers\n", argv[0]);
         return -1;
     }
 
@@ -78,12 +78,13 @@ int main (int argc, char *argv[]) {
     num_producers = atoi(argv[2]);
     num_consumers = atoi(argv[3]);
 
+    // error handling for negative values
     if (sleep_time < 0 || num_producers < 0 || num_consumers < 0) {
         fprintf(stderr, "Invalid arguments\n");
         return -1;
     }
 
-    // initialize buffer
+    // clean and initialize buffer
     buffer_cleanup();
     buffer_init();
 
@@ -92,20 +93,11 @@ int main (int argc, char *argv[]) {
     for (int i = 0; i < num_producers; ++i) {
         pthread_create(&threads, NULL, producer, NULL);
     }
-    // pthread_t con_threads;
+
+    // create consumer threads
     for (int i = 0; i < num_consumers; ++i) {
         pthread_create(&threads, NULL, consumer, NULL);
     }
-
-    // // join threads
-    // for (int i = 0; i < num_producers; i++) {
-    //     pthread_join(prod_threads, NULL);
-    // }
-    // for (int i = 0; i < num_consumers; i++) {
-    //     pthread_join(con_threads, NULL);
-    // }
-
-    // cleanup memory allocation 
 
     // sleep
     sleep(sleep_time);
