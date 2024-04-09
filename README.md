@@ -16,7 +16,7 @@ CPSC380 Section 01
 # files:
 buffer.c
 prodcon.c
-checksum.c
+Checksum.c
 README.md
 
 # running instructions:

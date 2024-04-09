@@ -74,6 +74,7 @@ int main (int argc, char *argv[]) {
         return -1;
     }
 
+    // convert parameters to integers 
     sleep_time = atoi(argv[1]);
     num_producers = atoi(argv[2]);
     num_consumers = atoi(argv[3]);

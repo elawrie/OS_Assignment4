@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-/* buffer.h */
+// define a buffer item
 typedef struct buffer_item {
     uint8_t data[30];
     uint16_t cksum;
