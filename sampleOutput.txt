@@ -1,0 +1,26 @@
+./prodcon 5 10 10
+
+Producer produced with checksum: 48180 
+Consumer consumed data with checksum: 48180 
+Producer produced with checksum: 8525 
+Producer produced with checksum: 64284 
+Consumer consumed data with checksum: 8525 
+Producer produced with checksum: 25288 
+Consumer consumed data with checksum: 64284 
+Consumer consumed data with checksum: 25288 
+Producer produced with checksum: 64161 
+Producer produced with checksum: 24729 
+Producer produced with checksum: 48383 
+Consumer consumed data with checksum: 64161 
+Consumer consumed data with checksum: 24729 
+Producer produced with checksum: 11136 
+Consumer consumed data with checksum: 48383 
+Consumer consumed data with checksum: 11136 
+Producer produced with checksum: 18297 
+Consumer consumed data with checksum: 18297 
+Error: unable to remove from empty buffer. Retrying now
+Error: unable to remove from empty buffer. Retrying now
+Error: unable to remove from empty buffer. Retrying now
+Producer produced with checksum: 56279 
+Producer produced with checksum: 18455 
+Consumer consumed data with checksum: 56279 
