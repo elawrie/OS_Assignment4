@@ -10,16 +10,18 @@ lawrie@chapman.edu
  
 CPSC380 Section 01
 
-# Worked with Evelyn Lawrie
+# Alejandro and Evelyn worked together
 
-# this is an implementation of the bounded buffer problem using semaphores
-# files:
+# This is an implementation of the bounded buffer problem using semaphores
+
+# Files:
 buffer.c
 prodcon.c
 Checksum.c
+sampleOutput.txt
 README.md
 
-# running instructions:
+# Running instructions:
 gcc -o prodcon prodcon.c buffer.c -Wall
 ./prodcon 5 10 10 
 
